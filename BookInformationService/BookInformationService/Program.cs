@@ -84,11 +84,11 @@ try
          */
     });
 
-    //EF
+    // EF
     builder.Services.AddDbContext<SystemDbContext>(options =>
                 options.UseSqlite(defaultConnectionString));
 
-    //Models
+    // Models
     builder.Services.AddScoped<IBookInformationDL, BookInformationDL>();
     builder.Services.AddScoped<IBookInformationBL, BookInformationBL>();
 
@@ -99,8 +99,15 @@ try
 
     var app = builder.Build();
 
-    app.Urls.Add("http://192.168.56.1:3101"); // Windows IP (ipconfig) http://192.168.56.1:3101/swagger/index.html (Development Environment)
-    app.Urls.Add("http://localhost:3101"); // 127.0.0.1 
+    // Apply migrations at startup
+    using (var scope = app.Services.CreateScope())
+    {
+        var dbContext = scope.ServiceProvider.GetRequiredService<SystemDbContext>();
+        dbContext.Database.Migrate();
+    }
+
+    //app.Urls.Add("http://192.168.56.1:3101"); // Windows IP (ipconfig) http://192.168.56.1:3101/swagger/index.html (Development Environment)
+    //app.Urls.Add("http://localhost:3101"); // 127.0.0.1 
 
     // Configure the HTTP request pipeline.
     // Command for Windows using PowerShell
@@ -134,30 +141,3 @@ finally
     Log.CloseAndFlush();
 }
 
-
-
-//var builder = WebApplication.CreateBuilder(args);
-
-//// Add services to the container.
-
-//builder.Services.AddControllers();
-//// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-//builder.Services.AddEndpointsApiExplorer();
-//builder.Services.AddSwaggerGen();
-
-//var app = builder.Build();
-
-//// Configure the HTTP request pipeline.
-//if (app.Environment.IsDevelopment())
-//{
-//    app.UseSwagger();
-//    app.UseSwaggerUI();
-//}
-
-//app.UseHttpsRedirection();
-
-//app.UseAuthorization();
-
-//app.MapControllers();
-
-//app.Run();
